@@ -66,6 +66,7 @@ namespace LibraryApi
             });
 
             services.AddScoped<ILookUpBooks, EfSqlBooksData>();
+            services.AddScoped<IBookCommands, EfSqlBooksData>();
 
             var mapperConfig = new MapperConfiguration(options =>
             {

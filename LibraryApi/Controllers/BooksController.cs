@@ -21,14 +21,16 @@ namespace LibraryApi.Controllers
         private readonly ILogger<BooksController> _logger;
 
         private readonly ILookUpBooks _bookLookup;
+        private readonly IBookCommands _bookCommands;
 
-        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger, ILookUpBooks bookLookup)
+        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger, ILookUpBooks bookLookup, IBookCommands bookCommands)
         {
             _context = context;
             _mapper = mapper;
             _config = config;
             _logger = logger;
             _bookLookup = bookLookup;
+            _bookCommands = bookCommands;
         }
 
 
@@ -52,13 +54,7 @@ namespace LibraryApi.Controllers
         [HttpDelete("/books/{id:int}")]
         public async Task<ActionResult> RemoveBookFromInventory(int id)
         {
-            var book = await _context.AvailableBooks.SingleOrDefaultAsync(b => b.Id == id);
-            if(book != null)
-            {
-                //_context.Books.Remove(book);
-                book.IsAvailable = false;
-                await _context.SaveChangesAsync();
-            }
+            await _bookCommands.RemoveBookAsync(id);
             return NoContent(); // this is a 204. A success. but there is no entity.
         }
 
@@ -110,10 +106,7 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetBookDetailsResponse>> GetBookById(int id)
         {
-            var book = await _context.AvailableBooks
-                 .Where(b => b.Id == id)
-                 .ProjectTo<GetBookDetailsResponse>(_config)
-                 .SingleOrDefaultAsync();
+            GetBookDetailsResponse book = await _bookLookup.GetBookByIdAsync(id);
 
             if (book == null)
             {
