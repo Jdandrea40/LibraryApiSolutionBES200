@@ -20,6 +20,8 @@ namespace LibraryApi.Controllers
         private readonly MapperConfiguration _config;
         private readonly ILogger<BooksController> _logger;
 
+        private readonly ILookUpBooks _bookLookup;
+
         public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger)
         {
             _context = context;
@@ -97,21 +99,7 @@ namespace LibraryApi.Controllers
         [HttpGet("/books")]
         public async Task<ActionResult<GetBooksSummaryResponse>> GetAllBooks([FromQuery] string genre = null)
         {
-            
-
-            var query = _context.AvailableBooks;
-            if(genre != null)
-            {
-                query = query.Where(b => b.Genre == genre);
-            };
-
-            var data = await query.ProjectTo<BookSummaryItem>(_config).ToListAsync();
-
-            var response = new GetBooksSummaryResponse
-            {
-                Data = data,
-                GenreFilter = genre
-            };
+            GetBooksSummaryResponse response = await _bookLookup.GetBooksByGenreAsync(genre);
             return Ok(response);
         }
 
