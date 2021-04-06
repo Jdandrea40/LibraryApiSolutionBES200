@@ -22,15 +22,16 @@ namespace LibraryApi.Controllers
 
         private readonly ILookUpBooks _bookLookup;
 
-        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger)
+        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger, ILookUpBooks bookLookup)
         {
             _context = context;
             _mapper = mapper;
             _config = config;
             _logger = logger;
+            _bookLookup = bookLookup;
         }
 
-        
+
 
         [HttpPut("/books/{id:int}/genre")]
         public async Task<ActionResult> UpdateGenre(int id, [FromBody] string genre)

@@ -65,6 +65,8 @@ namespace LibraryApi
                 options.UseSqlServer(Configuration.GetConnectionString("Library"));
             });
 
+            services.AddScoped<ILookUpBooks, EfSqlBooksData>();
+
             var mapperConfig = new MapperConfiguration(options =>
             {
                 options.AddProfile(new BooksProfile());
