@@ -34,6 +34,12 @@ namespace LibraryApi
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("redis");
+            });
+            services.AddScoped<ILookupOnCallDevelopers, RedisOnCallDeveloperLookup>();
+
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
