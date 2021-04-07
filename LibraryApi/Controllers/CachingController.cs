@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +11,21 @@ namespace LibraryApi.Controllers
     public class CachingController : ControllerBase
     {
         private readonly ILookupOnCallDevelopers _onCallDeveloperLookup;
+        private readonly IOptions<ProductInfoOptions> _productInfoOptions;
+        private readonly ILogger<CachingController> _logger;
 
-        public CachingController(ILookupOnCallDevelopers onCallDeveloperLookup)
+        public CachingController(ILookupOnCallDevelopers onCallDeveloperLookup, IOptions<ProductInfoOptions> productInfoOptions, ILogger<CachingController> logger)
         {
             _onCallDeveloperLookup = onCallDeveloperLookup;
+            _productInfoOptions = productInfoOptions;
+            _logger = logger;
+        }
+
+        [HttpGet("/productinfo")]
+        public ActionResult GetSomething()
+        {
+            _logger.LogInformation("Reading the configuration");
+            return Ok($"Allowing Backorders: {_productInfoOptions.Value.BackOrderAllowed }​​ - Markup {_productInfoOptions.Value.Markup}​​");
         }
 
         [HttpGet("/time")]

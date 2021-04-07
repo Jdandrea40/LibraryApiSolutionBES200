@@ -21,7 +21,18 @@ namespace LibraryApi.Services
         public async Task<OnCallDevelopersResponse> GetOnCallDeveloperAsync()
         {
             // Check to see if it is in the cache.
-            var cachedResponse = await _cache.GetAsync("oncall");
+            Byte[] cachedResponse;
+            try
+            {
+                cachedResponse = await _cache.GetAsync("oncall");
+
+            }
+            catch (Exception)
+            {
+
+                return await GetTheRealData();
+            }            
+            
             if (cachedResponse != null)
             {
                 // if it is there, we just return that thing.
@@ -32,15 +43,7 @@ namespace LibraryApi.Services
             else
             {
                 // if it isn't, we:
-                // - do the work to recreate it.
-                var dev = new OnCallDevelopersResponse
-                {
-                    Name = "Ryan",
-                    Email = "ryan@compuserve.com",
-                    Until = DateTime.Now.AddHours(12)
-                };
-
-
+                OnCallDevelopersResponse dev = await GetTheRealData();
 
                 // - put in the cache
                 var options = new DistributedCacheEntryOptions()
@@ -52,6 +55,18 @@ namespace LibraryApi.Services
                 return dev;
                 // - return that thing.        }
             }
+        }
+
+        private async Task<OnCallDevelopersResponse> GetTheRealData()
+        {
+            await Task.Delay(3000);
+            // - do the work to recreate it.
+            return new OnCallDevelopersResponse
+            {
+                Name = "Ryan",
+                Email = "ryan@compuserve.com",
+                Until = DateTime.Now.AddHours(12)
+            };
         }
     }
 }

@@ -34,6 +34,10 @@ namespace LibraryApi
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.Configure<ProductInfoOptions>(
+                Configuration.GetSection(ProductInfoOptions.SectionName)
+            );
+
             services.AddDistributedRedisCache(options =>
             {
                 options.Configuration = Configuration.GetConnectionString("redis");
