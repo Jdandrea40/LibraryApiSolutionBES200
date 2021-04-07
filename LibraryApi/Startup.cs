@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace LibraryApi
@@ -33,6 +34,8 @@ namespace LibraryApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<ILookupReservations, EfReservationLookup>();
+            services.AddScoped<IReservationCommands, EfReservationLookup>();
 
             services.Configure<ProductInfoOptions>(
                 Configuration.GetSection(ProductInfoOptions.SectionName)
@@ -47,9 +50,8 @@ namespace LibraryApi
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
-            });
-
-            
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });          
 
             services.AddSwaggerGen(c =>
             {
@@ -81,6 +83,7 @@ namespace LibraryApi
             var mapperConfig = new MapperConfiguration(options =>
             {
                 options.AddProfile(new BooksProfile());
+                options.AddProfile(new AutomapperReservationsProfile());
             });
 
             var mapper = mapperConfig.CreateMapper();
